@@ -10,7 +10,8 @@ namespace ServiceApp.Carts
     public interface ICartService
     {
         Task<ApiResult<bool>> Add(CartRequest request);
-        Task<List<CartViewModel>> GetCartByUserName(string userName);
-        Task<ApiResult<bool>> DeleteCart(string userName);
+        Task<List<CartViewModel>> GetCart();
+        Task<ApiResult<bool>> UpdateCart(UpdateCartRequest request);
+        Task<ApiResult<bool>> DeleteCart(DeleteCartRequets requets);
     }
 }

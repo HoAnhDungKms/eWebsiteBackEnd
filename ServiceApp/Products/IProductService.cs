@@ -10,7 +10,9 @@ namespace ServiceApp.Products
     public interface IProductService
     {
         Task<List<ProductVm>> GetAll();
-        Task<ProductVm> GetById(int productId);
+        Task<ProductVm> GetByName(string productName);
+        Task<ProductVm> GetById(int productid);
+        Task<List<ProductVm>> GetByCategoryId(int categoryId);
         Task<ApiResult<bool>> CreateProduct(CreateProductRequest request);
         Task<ApiResult<bool>> UpdateProduct(UpdateProductRequest request);
         Task<ApiResult<bool>> DeleteProduct(int productId);

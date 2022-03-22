@@ -30,7 +30,7 @@ namespace ServiceApp.Products
 
         public async Task<List<ProductVm>> GetAll()
         {
-            var category = await _context.Products.Select(x => new ProductVm()
+            var product = await _context.Products.Select(x => new ProductVm()
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -39,12 +39,12 @@ namespace ServiceApp.Products
                 Decription = x.Decription,
                 ImagePath = x.ImagePath,
             }).ToListAsync();
-            return category;
+            return product;
         }
 
-        public async Task<ProductVm> GetById(int productId)
+        public async Task<ProductVm> GetByName(string productName)
         {
-            var category = _context.Products.Where(x => x.Id == productId).Select(x => new ProductVm
+            var product = _context.Products.Where(x => x.Name == productName).Select(x => new ProductVm
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -53,7 +53,41 @@ namespace ServiceApp.Products
                 Decription = x.Decription,
                 ImagePath= x.ImagePath,
             }).FirstOrDefault();
-            return category;
+            return product;
+        }
+        public async Task<ProductVm> GetById(int productid)
+        {
+            var product = _context.Products.Where(x => x.Id == productid).Select(x => new ProductVm
+            {
+                Id = x.Id,
+                Name = x.Name,
+                CreatedDate = x.CreatedDate,
+                Price = x.Price,
+                Decription = x.Decription,
+                ImagePath = x.ImagePath,
+            }).FirstOrDefault();
+            return product;
+        }
+        public async Task<List<ProductVm>> GetByCategoryId(int categoryId)
+        {
+            var query = from p in _context.Products
+                        join pic in _context.ProductCategories on p.Id equals pic.ProductId
+                        join c in _context.Categories on pic.CategoryId equals c.Id
+                        select new { p, pic };
+            if (categoryId > 0)
+            {
+                query = query.Where(p => p.pic.CategoryId == categoryId);
+            }
+            var data = await query.Select(x => new ProductVm()
+                {
+                Id = x.p.Id,
+                Name = x.p.Name,
+                CreatedDate = x.p.CreatedDate,
+                Price = x.p.Price,
+                Decription = x.p.Decription,
+                ImagePath = x.p.ImagePath,
+            }).ToListAsync();
+            return data;
         }
 
         public async Task<ApiResult<bool>> CreateProduct(CreateProductRequest request)

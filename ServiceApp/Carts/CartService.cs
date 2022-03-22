@@ -23,13 +23,10 @@ namespace ServiceApp.Carts
         {
             if (request == null)
                 return new ApiErrorResult<bool>("Cart can't null");
-            var user = _context.Users.FirstOrDefault(u => u.Email == request.Email);
-            var userid = user.Id;
             foreach (var item in request.CartItems)
             {
                 var cart = new Cart();
                 cart.ProductId = item.ProductId;
-                cart.UserId = userid;
                 cart.Price = item.Price;
                 cart.Quantity = item.Quantity;
                 _context.Add(cart);
@@ -37,14 +34,12 @@ namespace ServiceApp.Carts
             await _context.SaveChangesAsync();
             return new ApiSuccessResult<bool>();
         }
-        public async Task<List<CartViewModel>> GetCartByUserName(string userName)
+        public async Task<List<CartViewModel>> GetCart()
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
             var cart = await _context.Carts.Select(r => new Itemvm()
             {
                 Id = r.Id,
                 ProductId = r.ProductId,
-                UserId = r.UserId,
                 Price = r.Price,
                 Quantity = r.Quantity,
             }).ToListAsync();
@@ -52,34 +47,73 @@ namespace ServiceApp.Carts
             var cartitem = new List<CartViewModel>();
             foreach (var item in cart)
             {
-                if (item.UserId == user.Id)
+                var product = _context.Products.FirstOrDefault(u => u.Id == item.ProductId);
+                var vm = new CartViewModel()
                 {
-                    var product = _context.Products.FirstOrDefault(u => u.Id == item.ProductId);
-                    var vm = new CartViewModel()
-                    {
-                        UserName = user.UserName,
-                        Email = user.Email,
-                        ProductId = item.ProductId,
-                        Name = product.Name,
-                        Price = item.Price,
-                        Quantity = item.Quantity,
-                        Description = product.Decription,
-                        Image = product.ImagePath,
-                    };
-                    cartitem.Add(vm);
-                }
+                    Id = item.Id,
+                    ProductId = item.ProductId,
+                    Name = product.Name,
+                    Price = item.Price,
+                    Quantity = item.Quantity,
+                    Description = product.Decription,
+                    Image = product.ImagePath,
+                };
+                cartitem.Add(vm);
+
             }
             return cartitem;
         }
-        public async Task<ApiResult<bool>> DeleteCart(string userName)
+        public async Task<ApiResult<bool>> UpdateCart(UpdateCartRequest request)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
-            var cart = await _context.Carts.FindAsync(user.Id);
-            if(cart == null) 
-                return new ApiErrorResult<bool>("Cart doesn't exits in database");
-            _context.Carts.Remove(cart);
+            if (request == null)
+                return new ApiErrorResult<bool>("Request can't null");
+            var cart = await _context.Carts.Select(r => new Itemvm()
+            {
+                Id = r.Id,
+                ProductId = r.ProductId,
+                Price = r.Price,
+                Quantity = r.Quantity,
+            }).ToListAsync();
+            foreach (var item in cart)
+            {
+                if (item.ProductId == request.productId)
+                {
+                    item.Quantity = request.Quantity;
+                }
+
+            }
             await _context.SaveChangesAsync();
             return new ApiSuccessResult<bool>();
         }
-    }
+        public async Task<ApiResult<bool>> DeleteCart(DeleteCartRequets requets)
+        {
+            var carts = new List<ItemViewModel>();
+            var addcart = new Cart();
+            var cartss = await _context.Carts.FindAsync(requets.Id);
+            var cart = await _context.Carts.Select(r => new ItemViewModel()
+            {
+                ProductId = r.ProductId,
+                Price = r.Price,
+                Quantity = r.Quantity,
+            }).ToListAsync();
+            foreach (var item in cart)
+            {
+                if (item.ProductId != requets.productId)
+                {
+                    carts.Add(item);
+                }
+
+            }
+            _context.Carts.Remove(cartss);
+            foreach (var item in carts)
+            {
+                addcart.ProductId = item.ProductId;
+                addcart.Price = item.Price;
+                addcart.Quantity = item.Quantity;
+                _context.Add(addcart);
+            }
+            await _context.SaveChangesAsync();
+            return new ApiSuccessResult<bool>();
+        }
+}
 }

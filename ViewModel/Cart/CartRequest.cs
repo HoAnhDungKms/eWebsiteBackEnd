@@ -9,8 +9,6 @@ namespace ViewModel.Cart
     public class CartRequest
     {
         public int Id { get; set; }      
-        public string UserName { get; set; }
-        public string Email { get; set; }
         public List<ItemViewModel> CartItems { get; set; } = new List<ItemViewModel>();
     }
 }

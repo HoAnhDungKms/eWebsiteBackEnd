@@ -9,7 +9,6 @@ namespace eWebsiteApi.Controllers
     //api/products
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -27,10 +26,27 @@ namespace eWebsiteApi.Controllers
             return Ok(products);
         }
 
-        [HttpGet("{productId}")]
+        [HttpGet("Name/{productName}")]
+        public async Task<IActionResult> GetByName(string productName)
+        {
+            var products = await _productService.GetByName(productName);
+            if (products == null)
+                return BadRequest("Can't find product");
+            return Ok(products);
+        }
+        [HttpGet("Id/{productId}")]
         public async Task<IActionResult> GetById(int productId)
         {
             var products = await _productService.GetById(productId);
+            if (products == null)
+                return BadRequest("Can't find product");
+            return Ok(products);
+        }
+
+        [HttpGet("{categoryId}/categories")]
+        public async Task<IActionResult> GetByCategoryId(int categoryId)
+        {
+            var products = await _productService.GetByCategoryId(categoryId);
             if (products == null)
                 return BadRequest("Can't find product");
             return Ok(products);
@@ -44,7 +60,7 @@ namespace eWebsiteApi.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var product = await _productService.CreateProduct(request);
+            var product = await _productService.CreateProduct(request); 
             if (!product.IsSuccessed)
                 return BadRequest("Can't create product");
             return Ok(product);

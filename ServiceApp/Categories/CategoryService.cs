@@ -67,7 +67,7 @@ namespace ServiceApp.Categories
         public async Task<ApiResult<bool>> DeleteCategory(int categoryId)
         {
             var category = await _context.Categories.FindAsync(categoryId);
-            if (category != null)
+            if (category == null)
                 return new ApiErrorResult<bool>("Can't find Category");
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();

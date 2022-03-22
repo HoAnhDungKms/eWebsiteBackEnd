@@ -9,7 +9,7 @@ namespace eWebsiteApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-
+   
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
@@ -36,6 +36,7 @@ namespace eWebsiteApi.Controllers
         }
         [HttpPost]
         [Consumes("multipart/form-data")]
+
         public async Task<IActionResult> CreateCategory([FromForm] CreateCategoryRequest request)
         {
             if (!ModelState.IsValid)

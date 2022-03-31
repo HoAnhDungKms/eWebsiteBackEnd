@@ -1,5 +1,6 @@
 using Data.EF;
 using Data.Entities;
+using eWebsiteApi.Middleware;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -40,16 +41,7 @@ namespace eWebsiteApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors(options =>
-            {
-                options.AddPolicy(name: MyAllowSpecificOrigins,
-                                  builder =>
-                                  {
-                                      builder.WithOrigins("http://localhost:3000")
-                                                                    .AllowAnyHeader()
-                                                                    .AllowAnyMethod();
-                                  });
-            });
+            services.AddCors();
             services.AddDbContext<eDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString(SystemConstants.MainConnectionString)));
 
@@ -143,7 +135,12 @@ namespace eWebsiteApi
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-            app.UseCors(MyAllowSpecificOrigins);
+            app.UseCors(x => x
+                .SetIsOriginAllowed(origin => true)
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
+            app.UseMiddleware<ErrorHandlerMiddleware>();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseAuthentication();

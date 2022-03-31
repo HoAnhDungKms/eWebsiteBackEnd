@@ -40,12 +40,12 @@ namespace ServiceApp.Users
         public async Task<ApiResult<string>> Authencate(LoginRequest request)
         {
             var user = await _userManager.FindByNameAsync(request.UserName);
-            if (user == null) return new ApiErrorResult<string>("Account Incorrect");
+            if (user == null) return new ApiErrorResult<string>("Account Incorrect !!!");
 
             var result = await _signInManager.PasswordSignInAsync(user, request.Password, request.RememberMe, true);
             if (!result.Succeeded)
             {
-                return new ApiErrorResult<string>("Login isn't Succussful");
+                return new ApiErrorResult<string>("Password Incorrect !!!");
             }
             var roles = await _userManager.GetRolesAsync(user);
             var claims = new[]

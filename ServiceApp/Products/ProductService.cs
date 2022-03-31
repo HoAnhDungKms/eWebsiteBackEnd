@@ -38,13 +38,13 @@ namespace ServiceApp.Products
                 Price = x.Price,
                 Decription = x.Decription,
                 ImagePath = x.ImagePath,
-            }).ToListAsync();
+            }).OrderBy(x=>x.Name).ToListAsync();
             return product;
         }
 
         public async Task<ProductVm> GetByName(string productName)
         {
-            var product = _context.Products.Where(x => x.Name == productName).Select(x => new ProductVm
+            var product = _context.Products.Where(x => x.Name.ToLower() == productName.ToLower()).Select(x => new ProductVm
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -86,7 +86,7 @@ namespace ServiceApp.Products
                 Price = x.p.Price,
                 Decription = x.p.Decription,
                 ImagePath = x.p.ImagePath,
-            }).ToListAsync();
+            }).OrderBy(x=>x.Name).ToListAsync();
             return data;
         }
 

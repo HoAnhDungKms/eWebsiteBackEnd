@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceApp.Products;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Utilities.Exceptions;
 using ViewModel.Product;
 
 namespace eWebsiteApi.Controllers
@@ -9,6 +12,7 @@ namespace eWebsiteApi.Controllers
     //api/products
     [Route("api/[controller]")]
     [ApiController]
+
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -31,7 +35,8 @@ namespace eWebsiteApi.Controllers
         {
             var products = await _productService.GetByName(productName);
             if (products == null)
-                return BadRequest("Can't find product");
+                //throw new eException("Can't find product");
+                throw new Exception("Can't find product.");
             return Ok(products);
         }
         [HttpGet("Id/{productId}")]
@@ -39,7 +44,7 @@ namespace eWebsiteApi.Controllers
         {
             var products = await _productService.GetById(productId);
             if (products == null)
-                return BadRequest("Can't find product");
+                throw new KeyNotFoundException("Can't find product");
             return Ok(products);
         }
 
